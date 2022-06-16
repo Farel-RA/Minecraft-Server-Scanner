@@ -18,7 +18,6 @@ on:
 jobs:
   download_uncompress:
     runs-on: ubuntu-latest
-
     steps:
       - name: Preparing
         run: |
@@ -28,6 +27,7 @@ jobs:
          sudo apt update
          sudo apt upgrade
          sudo apt install aria2
+         
       - name: Maximize disk space
         if: github.event.inputs.maximize_disk_space == 'true'
         uses: easimon/maximize-build-space@v5
@@ -35,10 +35,12 @@ jobs:
           remove-dotnet: true
           remove-android: true
           remove-haskell: true
+          
       - name: Download file
         run: |
          cd $HOME/Download
          aria2c -x 16 -o "${{ github.event.inputs.file_name }}" "${{ github.event.inputs.url }}"
+         
       - name: Uncompress file
         run: |
          cd $HOME/Download
