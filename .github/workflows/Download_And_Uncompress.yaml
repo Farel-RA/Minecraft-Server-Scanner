@@ -43,4 +43,8 @@ jobs:
         run: |
          cd $HOME/Download
          tar -xvzf "${{ github.event.inputs.file_name }}" -C $HOME/Files
-         ls -lah $HOME/Files/
+      - name: Upload torrent file
+        uses: actions/upload-artifact@v3
+        with:
+          name: chromeos-install.sh
+          path: /home/runner/Files/chromeos-install.sh
