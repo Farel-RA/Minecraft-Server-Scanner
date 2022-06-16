@@ -15,7 +15,7 @@ on:
         default: false
 
 jobs:
-  download_uncompress:
+  Download-Uncompress:
     runs-on: ubuntu-latest
     steps:
       - name: Preparing
@@ -24,7 +24,6 @@ jobs:
          mkdir Download
          mkdir Files
          sudo apt update
-         sudo apt upgrade
          sudo apt install aria2
          
       - name: Maximize disk space
