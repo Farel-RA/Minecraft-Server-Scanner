@@ -42,5 +42,5 @@ jobs:
       - name: Uncompress file
         run: |
          cd $HOME/Download
-         tar –xvzf "${{ github.event.inputs.file_name }}" –C $HOME/Files
+         tar -xvzf "${{ github.event.inputs.file_name }}" -C $HOME/Files
          ls -lah $HOME/Files/
