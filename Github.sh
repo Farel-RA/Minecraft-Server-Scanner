@@ -6,6 +6,7 @@ if [ "${{ inputs.action }}" = Hash ];then
     md5sum "$file"
 fi
 if [ "${{ inputs.action }}" = Download ];then
+    cp "$file" "$output"
     sha256sum "$file"
     md5sum "$file"
 fi
