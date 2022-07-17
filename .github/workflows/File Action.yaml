@@ -86,9 +86,6 @@ jobs:
                  echo Done
              fi
              if [ "${{ inputs.compress }}" = 7z ];then
-                 echo Installing 7-Zip
-                 sudo apt update
-                 sudo apt install p7zip-full -y
                  echo Compressing...
                  7z a -mx=9 "$output.7z" "$file"
                  sha256sum "$output.7z"
