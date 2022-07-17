@@ -46,11 +46,14 @@ jobs:
           remove-android: true
           remove-haskell: true
       - name: Download file
-        run: aria2c -x 16 -o $HOME/Download/"${{ inputs.file_name }}" "${{ inputs.file_link }}"
+        run: |
+         cd $HOME/Download
+         aria2c -x 16 -o "${{ inputs.file_name }}" "${{ inputs.file_link }}"
       - name: Action
         run: |
          export file="$HOME/Download/"${{ inputs.file_name }}""
          export output="$HOME/Files/"${{ inputs.file_name }}""
+         cd $HOME
          if [ "${{ inputs.action }}" = Hash ];then
              sha256sum "$file"
              md5sum "$file"
