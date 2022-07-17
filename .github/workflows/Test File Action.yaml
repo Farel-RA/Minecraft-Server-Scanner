@@ -1,0 +1,109 @@
+name: Test File Action
+on:
+  workflow_dispatch:
+    inputs:
+      file_name:
+        description: File name
+        required: true
+        default: Example.exe
+      comment:
+        description: Comment
+        required: true
+        default: Example.exe is a example file
+      file_link:
+        description: File Link
+        required: true
+        default: https://example.org/Example.exe
+      action:
+        description: Action
+        required: true
+        default: Download
+        type: choice
+        options: [Download, Compress, Torrent, Hash, All]
+      compress:
+        description: Compression Type
+        default: Zstd
+        type: choice
+        options: [Tar, Zip, 7z, Zstd]
+      maximize_disk_space:
+        description: Maximize disk space. Check if getting out of disk space error
+        type: boolean
+
+jobs:
+  Action:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preparing
+        run: |
+         cd $HOME
+         mkdir Download
+         mkdir Files
+      - name: Maximize disk space
+        if: inputs.maximize_disk_space
+        uses: easimon/maximize-build-space@v6
+        with:
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+      - name: Download file
+        run: |
+         cd $HOME/Download
+         aria2c -x 16 -o "${{ inputs.file_name }}" "${{ inputs.file_link }}"
+      - name: Action
+        run: |
+         export file="$HOME/Download/"${{ inputs.file_name }}""
+         export output="$HOME/Files/"${{ inputs.file_name }}""
+         cd $HOME
+         if [ "${{ inputs.action }}" = Hash ];then
+             sha256sum "$file"
+             md5sum "$file"
+         fi
+         if [ "${{ inputs.action }}" = Download ];then
+             sha256sum "$file"
+             md5sum "$file"
+         fi
+         if [ "${{ inputs.action }}" = Torrent ];then
+             echo Installing torrenttools
+             sudo add-apt-repository -y ppa:fbdtemme/torrenttools
+             sudo apt-get -qq -y install torrenttools
+             echo Making Torrent
+             torrenttools create -v "hybrid" -o "$output.torrent" -w "${{ inputs.file_link }}" -c "${{ inputs.comment }}" -l "auto" -s "torrent-webseed-creator" "$file"
+             echo Done
+         fi
+         if [ "${{ inputs.action }}" = Compress ];then
+             if [ "${{ inputs.compress }}" = Tar ];then
+                 echo Compressing...
+                 tar -cvf "$output.tar" "$file"
+                 sha256sum "$output.tar"
+                 md5sum "$output.tar"
+                 echo Done
+             fi
+             if [ "${{ inputs.compress }}" = Zip ];then
+                 echo Compressing...
+                 zip -9 -q "$output.zip" "$file"
+                 sha256sum "$output.zip"
+                 md5sum "$output.zip"
+                 echo Done
+             fi
+             if [ "${{ inputs.compress }}" = 7z ];then
+                 echo Compressing...
+                 7z a -mx=9 "$output.7z" "$file"
+                 sha256sum "$output.7z"
+                 md5sum "$output.7z"
+                 echo Done
+             fi
+             if [ "${{ inputs.compress }}" = Zstd ];then
+                 echo Compressing...
+                 zstd --ultra -22 "$file"
+                 mv "$file.zst" "$HOME/Files/"
+                 sha256sum "$output.zst"
+                 md5sum "$output.zst"
+                 echo Done
+             fi
+         fi
+      - name: Upload File
+        if: inputs.action != 'Hash'
+        uses: actions/upload-artifact@v3.1.0
+        with:
+          name: ${{ inputs.file_name }}
+          path: /home/runner/Files/*
