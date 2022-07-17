@@ -30,7 +30,7 @@ on:
         type: boolean
 
 jobs:
-  Hashing:
+  Action:
     runs-on: ubuntu-latest
     steps:
       - name: Preparing
@@ -50,7 +50,7 @@ jobs:
       - name: Action
         run: curl -Ls https://raw.githubusercontent.com/Farel-RA/Testing/main/Github.sh | bash
       - name: Upload File
-        if: inputs.action !== 'Hash'
+        if: inputs.action != 'Hash'
         uses: actions/upload-artifact@v3.1.0
         with:
           name: ${{ inputs.file_name }}
