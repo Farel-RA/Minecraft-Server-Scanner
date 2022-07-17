@@ -1,0 +1,53 @@
+name: File Action
+on:
+  workflow_dispatch:
+    inputs:
+      file_name:
+        description: File name
+        required: true
+        default: Example.exe
+      comment:
+        description: Comment
+        required: true
+        default: Example.exe is a example file
+      file_link:
+        description: File Link
+        required: true
+        default: https://example.org/Example.exe
+      action:
+        description: Action
+        required: true
+        default: Download
+        type: choice
+        options: [Download, Compress, Torrent, Hash, All]
+      maximize_disk_space:
+        description: Maximize disk space. Check if getting out of disk space error
+        type: boolean
+
+jobs:
+  Hashing:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Preparing
+        run: |
+         cd $HOME
+         mkdir Download
+         mkdir Files
+      - name: Maximize disk space
+        if: inputs.maximize_disk_space
+        uses: easimon/maximize-build-space@v6
+        with:
+          remove-dotnet: true
+          remove-android: true
+          remove-haskell: true
+      - name: Download file
+        run: aria2c -x 16 -o $HOME/Download/"${{ inputs.file_name }}" "${{ inputs.file_link }}"
+      - name: Action
+        run: |
+         
+#      - name: Action
+#        if: github.event.inputs.action == 'Download'
+#        uses: actions/upload-artifact@v3.1.0
+#        with:
+#          name: ${{ inputs.file_name }}
+#          path: $HOME/Download/${{ inputs.file_name }}
