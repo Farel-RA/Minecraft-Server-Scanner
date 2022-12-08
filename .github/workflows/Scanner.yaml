@@ -1,0 +1,30 @@
+name: Minecraft Server Scanner
+on:
+  workflow_dispatch:
+    inputs:
+      network:
+        description: IP network to scan
+        required: true
+        default: 0.0.0.0/0
+      port:
+        description: Port to scan
+        required: true
+        default: 25565
+
+jobs:
+  Scanning:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+          architecture: 'x64'
+      - name: Scanning for Minecraft Server
+        run: python scanner.py -n ${{ inputs.network }} -p ${{ inputs.port }}
+      - name: Upload Result
+        uses: actions/upload-artifact@v3
+        with:
+          name: server_ips.txt
+          path: server_ips.txt
